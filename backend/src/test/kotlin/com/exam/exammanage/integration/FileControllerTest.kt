@@ -1,6 +1,7 @@
 package com.exam.exammanage.integration
 
 import com.exam.exammanage.exam.application.ExamDTO
+import com.exam.exammanage.exam.domain.Exam
 import com.exam.exammanage.exam.ports.IPersistExams
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -12,9 +13,12 @@ import jakarta.transaction.Transactional
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
+import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.multipart
 import org.springframework.test.web.servlet.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart
 
 @Transactional
 @SpringBootTest
@@ -50,11 +54,21 @@ class FileControllerTest(mockMvc: MockMvc, examRepository: IPersistExams) : Beha
         }
     }
 
-    given("an existing exam") {
+    given("an existing exam in the database") {
+        val exam = examRepository.saveExam(Exam(subject = "Computer Science", year = 2023))
         and("a file") {
+            val file = this::class.java.getResource("/Test_MD.pdf").readBytes()
             `when`("calling POST /exams/{id}/file") {
+                    mockMvc.multipart("/exams/${exam.examId}/file") {
+                        file(MockMultipartFile("exam_file", "Test_MD.pdf", MediaType.APPLICATION_PDF.type, file))
+                    }.andDo {
+                        print()
+                    }.andExpect {
+                        status { isOk() }
+                    }.andReturn().response.contentAsString
                 then("the file should be persisted") {
-
+                    val returnedExam = examRepository.findExamById(exam.examId)
+                    returnedExam.examFile shouldBe file
                 }
             }
         }

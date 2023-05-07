@@ -11,7 +11,7 @@ class ExamDomainService(val examRepository: IPersistExams) {
         return examRepository.saveExam(exam)
     }
 
-    fun addExamFile(id: UUID, file: File) {
+    fun addExamFile(id: UUID, file: ByteArray) {
         val exam = examRepository.findExamById(id)
         exam.examFile = file
         examRepository.saveExam(exam)
