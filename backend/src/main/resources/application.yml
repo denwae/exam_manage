@@ -1,1 +1,7 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+---
 
+hibernate.type.preferred_uuid_jdbc_type=CHAR
