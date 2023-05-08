@@ -16,6 +16,7 @@ import org.springframework.http.MediaType
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.multipart
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart
@@ -59,13 +60,13 @@ class FileControllerTest(mockMvc: MockMvc, examRepository: IPersistExams) : Beha
         and("a file") {
             val file = this::class.java.getResource("/Test_MD.pdf").readBytes()
             `when`("calling POST /exams/{id}/file") {
-                    mockMvc.multipart("/exams/${exam.examId}/file") {
-                        file(MockMultipartFile("exam_file", "Test_MD.pdf", MediaType.APPLICATION_PDF.type, file))
-                    }.andDo {
-                        print()
-                    }.andExpect {
-                        status { isOk() }
-                    }.andReturn().response.contentAsString
+                mockMvc.multipart("/exams/${exam.examId}/file") {
+                    file(MockMultipartFile("exam_file", "Test_MD.pdf", MediaType.APPLICATION_PDF.type, file))
+                }.andDo {
+                    print()
+                }.andExpect {
+                    status { isOk() }
+                }.andReturn().response.contentAsString
                 then("the file should be persisted") {
                     val returnedExam = examRepository.findExamById(exam.examId)
                     returnedExam.examFile shouldBe file
@@ -75,11 +76,38 @@ class FileControllerTest(mockMvc: MockMvc, examRepository: IPersistExams) : Beha
     }
 
     given("an existing exam with an exam file") {
+        val exam = examRepository.saveExam(
+            Exam(
+                subject = "Politics",
+                year = 2023,
+                examFile = this::class.java.getResource("/Test_MD.pdf").readBytes()
+            )
+        )
         and("a new file") {
+            val file = this::class.java.getResource("/Test_MD_2.pdf").readBytes()
             `when`("calling POST /exams/{id}/file") {
+                mockMvc.multipart("/exams/${exam.examId}/file") {
+                    file(MockMultipartFile("exam_file", "Test_MD_2.pdf", MediaType.APPLICATION_PDF.type, file))
+                }.andDo {
+                    print()
+                }.andExpect {
+                    status { isOk() }
+                }.andReturn().response.contentAsString
                 then("the new file should be persisted") {
-
+                    val returnedExam = examRepository.findExamById(exam.examId)
+                    returnedExam.examFile shouldBe file
                 }
+            }
+        }
+        `when`("calling GET /exams/{id}/file") {
+            val returnedFile = mockMvc.get("/exams/${exam.examId}/file")
+                .andDo {
+                    print()
+                }.andExpectAll {
+                    status { isOk() }
+                }.andReturn().response.contentAsByteArray
+            then("the correct file should be returned") {
+                returnedFile shouldBe exam.examFile
             }
         }
     }

@@ -61,5 +61,11 @@ class FileServiceTest : BehaviorSpec({
                 }
             }
         }
+        `when`("when getting the file"){
+            val downloadedFile = examService.getExamFile(exam.examId)
+            then("the correct file will be returned"){
+                downloadedFile shouldBe exam.examFile
+            }
+        }
     }
 })

@@ -1,5 +1,6 @@
 package com.exam.exammanage.exam.domain
 
+import com.exam.exammanage.exam.domain.exceptions.ExamFileNotPresentException
 import com.exam.exammanage.exam.ports.IPersistExams
 import org.springframework.stereotype.Service
 import java.io.File
@@ -15,6 +16,11 @@ class ExamDomainService(val examRepository: IPersistExams) {
         val exam = examRepository.findExamById(id)
         exam.examFile = file
         examRepository.saveExam(exam)
+    }
+
+    fun getExamFile(examId: UUID): ByteArray {
+        return examRepository.findExamById(examId).examFile
+            ?: throw ExamFileNotPresentException("No file present for exam with id $examId")
     }
 
 }

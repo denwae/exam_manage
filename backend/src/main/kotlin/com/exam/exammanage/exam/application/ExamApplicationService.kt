@@ -15,4 +15,8 @@ class ExamApplicationService(private val examDomainService: ExamDomainService) {
         examDomainService.addExamFile(examId, file.bytes)
     }
 
+    fun getExamFile(examId: UUID): ByteArray {
+        return examDomainService.getExamFile(examId)
+    }
+
 }
