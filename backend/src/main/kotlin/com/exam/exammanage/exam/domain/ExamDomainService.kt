@@ -23,4 +23,12 @@ class ExamDomainService(val examRepository: IPersistExams) {
             ?: throw ExamFileNotPresentException("No file present for exam with id $examId")
     }
 
+    fun getAllExams(year: Int? = null): List<Exam> {
+        var exams = examRepository.findAllExams()
+        if(year != null) {
+            exams = exams.filter { it.year == year }
+        }
+        return exams
+    }
+
 }

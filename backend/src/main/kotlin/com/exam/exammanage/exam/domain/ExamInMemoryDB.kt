@@ -25,7 +25,7 @@ class ExamInMemoryDB: IPersistExams {
     }
 
     override fun findAllExams(): List<Exam> {
-        TODO("Not yet implemented")
+        return exams.values.toList()
     }
 
     override fun deleteExamById(id: String) {
