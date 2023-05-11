@@ -19,4 +19,8 @@ class ExamApplicationService(private val examDomainService: ExamDomainService) {
         return examDomainService.getExamFile(examId)
     }
 
+    fun getAllExams(year: Int?): List<ExamDTO> {
+        return examDomainService.getAllExams(year).map { ExamDTO.fromExam(it) }
+    }
+
 }

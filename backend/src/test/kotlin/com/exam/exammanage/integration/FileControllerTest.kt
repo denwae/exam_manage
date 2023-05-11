@@ -8,7 +8,9 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
+import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldHave
 import io.kotest.matchers.shouldNotBe
 import jakarta.transaction.Transactional
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -115,6 +117,48 @@ class FileControllerTest(mockMvc: MockMvc, examRepository: ExamRepository) : Beh
                 }.andReturn().response.contentAsByteArray
             then("the correct file should be returned") {
                 returnedFile shouldBe exam.examFile
+            }
+        }
+    }
+
+    given("multiple exams in the db with different dates") {
+        beforeContainer{
+            examRepository.deleteAll()
+        }
+        `when`("calling GET /exams") {
+            val exam1 = examRepository.save(Exam(subject = "Computer Science", year = 2023))
+            val exam2 = examRepository.save(Exam(subject = "History", year = 2023))
+            val exam3 = examRepository.save(Exam(subject = "Geography", year = 2024))
+            val exam4 = examRepository.save(Exam(subject = "Maths", year = 2022))
+            val returnedExams: List<Exam> = jacksonObjectMapper().readValue(mockMvc.get("/exams")
+                .andDo {
+                    print()
+                }.andExpectAll {
+                    status { isOk() }
+                }.andReturn().response.contentAsString
+            )
+            then("all exams should be returned") {
+                returnedExams.size shouldBe 4
+            }
+        }
+        `when`("calling GET /exams?year=2023"){
+            val exam1 = examRepository.save(Exam(subject = "Computer Science", year = 2023))
+            val exam2 = examRepository.save(Exam(subject = "History", year = 2023))
+            val exam3 = examRepository.save(Exam(subject = "Geography", year = 2024))
+            val exam4 = examRepository.save(Exam(subject = "Maths", year = 2022))
+            val returnedExams: List<ExamDTO> = jacksonObjectMapper().readValue(
+                mockMvc.get("/exams"){
+                    param("year", "2023")
+                }
+                .andDo {
+                    print()
+                }.andExpectAll {
+                    status { isOk() }
+                }.andReturn().response.contentAsString
+            )
+            then("only 2023 exams should be returned"){
+                returnedExams.size shouldBe 2
+                returnedExams shouldContainAll listOf(ExamDTO.fromExam(exam1), ExamDTO.fromExam(exam2))
             }
         }
     }

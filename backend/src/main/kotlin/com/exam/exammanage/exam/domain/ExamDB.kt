@@ -25,7 +25,7 @@ class ExamDB(val examRepository: ExamRepository): IPersistExams {
     }
 
     override fun findAllExams(): List<Exam> {
-        TODO("Not yet implemented")
+        return examRepository.findAll()
     }
 
     override fun deleteExamById(id: String) {

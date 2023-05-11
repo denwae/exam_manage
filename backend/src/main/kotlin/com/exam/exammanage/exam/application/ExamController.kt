@@ -32,4 +32,9 @@ class ExamController(private val examService: ExamApplicationService) {
     fun uploadFile(@PathVariable examId: UUID, @RequestParam("exam_file") file: MultipartFile) {
         examService.addFile(examId, file)
     }
+
+    @GetMapping
+    fun getAllExams(@RequestParam("year", required = false) year: Int?): ResponseEntity<List<ExamDTO>> {
+        return ResponseEntity.ok(examService.getAllExams(year))
+    }
 }

@@ -85,7 +85,6 @@ class FileServiceTest : BehaviorSpec({
             val exams = examService.getAllExams()
             then("all four exams should be returned"){
                 exams.size shouldBe 4
-                exams shouldContainAll listOf(exam1, exam2)
             }
         }
         `when`("getting all exams with a date"){
@@ -93,8 +92,10 @@ class FileServiceTest : BehaviorSpec({
             val exam2 = examRepository.saveExam(Exam(subject = "German", year = 2023))
             val exam3 = examRepository.saveExam(Exam(subject = "French", year = 2024))
             val exam4 = examRepository.saveExam(Exam(subject = "Spanish", year = 2022))
+            val returnedExams = examService.getAllExams(2023)
             then("only the two exams with the correct year should be returned"){
-                examService.getAllExams(2023).size shouldBe 2
+                returnedExams.size shouldBe 2
+                returnedExams shouldContainAll listOf(exam1, exam2)
             }
         }
     }
