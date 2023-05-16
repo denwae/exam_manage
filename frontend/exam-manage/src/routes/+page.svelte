@@ -1,17 +1,2 @@
-<script lang="ts">
-    let count = 0;
-
-    console.log("Runs")
-
-    function incrementCount() {
-        console.log("got clicked")
-        count += 1;
-    }
-</script>
-
-<h1>home</h1>
-<p>this is the about page.</p>
-
-<button on:click={incrementCount}>
-    Clicked {count} {count === 1 ? 'time' : 'times'}
-</button>
+<h1>Welcome to SvelteKit</h1>
+<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
