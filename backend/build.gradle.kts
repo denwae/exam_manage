@@ -5,10 +5,13 @@ val kotestVersion = "5.6.1"
 plugins {
     id("org.springframework.boot") version "3.0.6"
     id("io.spring.dependency-management") version "1.1.0"
+    id("com.google.cloud.tools.jib") version "3.3.2"
     kotlin("jvm") version "1.8.21"
     kotlin("plugin.spring") version "1.8.21"
     kotlin("plugin.jpa") version "1.8.21"
 }
+
+jib.to.image = "ghcr.io/denwae/exam-manage-backend:latest"
 
 group = "com.exam"
 version = "0.0.1-SNAPSHOT"
