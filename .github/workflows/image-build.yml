@@ -1,0 +1,31 @@
+name: Build and push images
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME_FRONTEND: ${{ github.repository }}-frontend
+
+jobs:
+  build-and-push-backend:
+    name: Build and push backend image to ghcr
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+        
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@d23c38fad3e837961b39af2b98b046694927aca4
+      
+      - name: Log in to container registry
+        uses: docker/login-action@40891eba8c2bcd1309b07ba8b11232f313e86779
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Build and push image with jib
+        run: ./gradlew backend:jib
