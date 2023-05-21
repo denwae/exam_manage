@@ -20,6 +20,9 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@d23c38fad3e837961b39af2b98b046694927aca4
       
+      - name: Execute Gradle build
+        run: ./gradlew build
+      
       - name: Log in to container registry
         uses: docker/login-action@40891eba8c2bcd1309b07ba8b11232f313e86779
         with:
