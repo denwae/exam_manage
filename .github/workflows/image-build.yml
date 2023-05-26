@@ -10,7 +10,7 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME_BACKEND: ${{ github.repository }}-backend:latest
   IMAGE_NAME_FRONTEND: ${{ github.repository }}-frontend
-  EXAM_MANAGE_BACKEND_CONTAINER_REGISTRY: ${{ REGISTRY }}/${{ IMAGE_NAME_BACKEND }}
+  EXAM_MANAGE_BACKEND_CONTAINER_REGISTRY: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}
 
 jobs:
   build-and-push-backend:
