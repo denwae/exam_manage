@@ -5,3 +5,15 @@ spring:
 ---
 
 hibernate.type.preferred_uuid_jdbc_type=CHAR
+
+---
+spring:
+  datasource:
+    url: jdbc:postgresql://${EXAM_MANAGE_DB_URL}/exam-manage
+    username: postgres
+    password: ${EXAM_MANAGE_DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
