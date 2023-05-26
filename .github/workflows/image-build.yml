@@ -10,7 +10,6 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME_BACKEND: ${{ github.repository }}-backend:latest
   IMAGE_NAME_FRONTEND: ${{ github.repository }}-frontend
-  EXAM_MANAGE_BACKEND_CONTAINER_REGISTRY: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}
 
 jobs:
   build-and-push-backend:
@@ -19,7 +18,10 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
-        
+
+      - name: set backend registry env var
+        run: echo "EXAM_MANAGE_BACKEND_CONTAINER_REGISTRY=$REGISTRY/$IMAGE_NAME_BACKEND" >> $GITHUB_ENV
+
       - name: Setup Java 17
         uses: actions/setup-java@v3
         with:
