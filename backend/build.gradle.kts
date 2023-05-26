@@ -11,7 +11,7 @@ plugins {
     kotlin("plugin.jpa") version "1.8.21"
 }
 
-jib.to.image = "ghcr.io/denwae/exam-manage-backend:latest"
+jib.to.image = System.getenv("EXAM_MANAGE_BACKEND_CONTAINER_REGISTRY") ?: "ghcr.io/denwae/exam_manage-backend:latest"
 
 group = "com.exam"
 version = "0.0.1-SNAPSHOT"
