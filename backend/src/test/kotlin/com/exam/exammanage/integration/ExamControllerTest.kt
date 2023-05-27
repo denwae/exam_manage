@@ -3,14 +3,12 @@ package com.exam.exammanage.integration
 import com.exam.exammanage.exam.application.ExamDTO
 import com.exam.exammanage.exam.domain.Exam
 import com.exam.exammanage.exam.domain.ExamRepository
-import com.exam.exammanage.exam.ports.IPersistExams
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldHave
 import io.kotest.matchers.shouldNotBe
 import jakarta.transaction.Transactional
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -23,13 +21,12 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.multipart
 import org.springframework.test.web.servlet.post
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart
 
 @Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class FileControllerTest(mockMvc: MockMvc, examRepository: ExamRepository) : BehaviorSpec({
+class ExamControllerTest(mockMvc: MockMvc, examRepository: ExamRepository) : BehaviorSpec({
 
     given("an exam DTO") {
         val examDTO = ExamDTO(subject = "History", year = 2023)
@@ -65,7 +62,7 @@ class FileControllerTest(mockMvc: MockMvc, examRepository: ExamRepository) : Beh
             val file = this::class.java.getResource("/Test_MD.pdf").readBytes()
             `when`("calling POST /exams/{id}/file") {
                 mockMvc.multipart("/exams/${exam.examId}/file") {
-                    file(MockMultipartFile("exam_file", "Test_MD.pdf", MediaType.APPLICATION_PDF.type, file))
+                    file(MockMultipartFile("file", "Test_MD.pdf", MediaType.APPLICATION_PDF.type, file))
                 }.andDo {
                     print()
                 }.andExpect {
@@ -96,7 +93,7 @@ class FileControllerTest(mockMvc: MockMvc, examRepository: ExamRepository) : Beh
             val file = this::class.java.getResource("/Test_MD_2.pdf").readBytes()
             `when`("calling POST /exams/{id}/file") {
                 mockMvc.multipart("/exams/${exam.examId}/file") {
-                    file(MockMultipartFile("exam_file", "Test_MD_2.pdf", MediaType.APPLICATION_PDF.type, file))
+                    file(MockMultipartFile("file", "Test_MD_2.pdf", MediaType.APPLICATION_PDF.type, file))
                 }.andDo {
                     print()
                 }.andExpect {

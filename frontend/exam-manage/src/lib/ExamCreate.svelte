@@ -24,7 +24,7 @@
 </script>
 
 
-<div tabindex="0" class="collapse collapse-arrow border border-base-300 bg-base-100 rounded-box my-5">
+<div tabindex="0" class="collapse collapse-arrow border border-base-300 bg-base-100 rounded-box my-5 bg-base-200">
     <input type="checkbox" />
     <div class="collapse-title font-medium">
         <h1>Klausur erstellen</h1>

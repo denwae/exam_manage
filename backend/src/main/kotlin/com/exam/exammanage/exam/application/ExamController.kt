@@ -3,7 +3,6 @@ package com.exam.exammanage.exam.application
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -30,8 +29,9 @@ class ExamController(private val examService: ExamApplicationService) {
     }
 
     @PostMapping("/{examId}/file")
-    fun uploadFile(@PathVariable examId: UUID, @RequestParam("exam_file") file: MultipartFile) {
+    fun uploadFile(@PathVariable examId: UUID, @RequestParam("file") file: MultipartFile): ResponseEntity<String> {
         examService.addFile(examId, file)
+        return ResponseEntity.ok("File uploaded successfully")
     }
 
     @GetMapping
