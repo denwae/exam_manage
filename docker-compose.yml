@@ -1,6 +1,6 @@
 services:
   frontend:
-    image: ghcr.io/denwae/exam-manage-frontend:latest
+    image: ghcr.io/denwae/exam_manage-frontend:latest
     ports:
       - "8080:80"
     networks:
@@ -8,11 +8,11 @@ services:
     depends_on:
       - backend
     environment:
-      - EXAM_MANAGE_FRONTED_SERVER_NAME=localhost
+      - EXAM_MANAGE_FRONTEND_SERVER_NAME=localhost
       - EXAM_MANAGE_BACKEND_URL=http://backend:8080
       - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx
   backend:
-    image: ghcr.io/denwae/exam-manage-backend:latest
+    image: ghcr.io/denwae/exam_manage-backend:latest
     networks:
       - front-tier
       - back-tier
