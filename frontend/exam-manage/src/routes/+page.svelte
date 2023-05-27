@@ -1,21 +1,17 @@
 <script>
     import ExamList from "$lib/ExamList.svelte";
-    import ExamUpload from "../lib/ExamUpload.svelte";
+    import ExamUpload from "$lib/ExamCreate.svelte";
+    import { exams } from "$lib/stores.js"
 
     /** @type {import('./$types').PageData} */
     export let data;
-
-    async function getExams(){
-        const res = await fetch("http://localhost:8080/exams")
-        const json = await res.json()
-        console.log(json)
-    }
+    $exams = data.exams;
 </script>
 
 
-<h1>Exam Manage</h1>
+<h1 class="text-4xl font-bold">Exam Manage</h1>
 
 <ExamUpload />
 
-<ExamList exams={data.exams} />
+<ExamList />
 

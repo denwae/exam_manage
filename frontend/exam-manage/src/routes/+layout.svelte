@@ -1,7 +1,7 @@
 <script>
     import '../app.css';
 </script>
-<div class="container mx-auto prose flex justify-center">
+<div class="container mx-auto flex justify-center">
     <div>
         <slot />
     </div>
