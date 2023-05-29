@@ -21,6 +21,7 @@ services:
       - db
     environment:
       - EXAM_MANAGE_DB_URL=db
+      - EXAM_MANAGE_DB_USERNAME=postgres
       - EXAM_MANAGE_DB_PASSWORD=password
   db:
     image: postgres:latest
