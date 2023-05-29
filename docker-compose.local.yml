@@ -1,0 +1,49 @@
+services:
+  frontend:
+    image: ghcr.io/denwae/exam_manage-frontend:latest
+    ports:
+      - "4200:80"
+    networks:
+      - front-tier
+    depends_on:
+      - backend
+    environment:
+      - EXAM_MANAGE_FRONTEND_SERVER_NAME=localhost
+      - EXAM_MANAGE_BACKEND_URL=http://exammanage-backend:8080
+      - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx
+  backend:
+    container_name: exammanage-backend
+    image: ghcr.io/denwae/exam_manage-backend:latest
+    networks:
+      - front-tier
+      - back-tier
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - EXAM_MANAGE_DB_URL=db
+      - EXAM_MANAGE_DB_USERNAME=postgres
+      - EXAM_MANAGE_DB_PASSWORD=password
+  db:
+    image: postgres:latest
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - back-tier
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=exam-manage
+      - POSTGRES_USER=postgres
+
+volumes:
+  db-data: {}
+
+networks:
+  front-tier:
+    driver: bridge
+  back-tier:
+    name: exammanage-back-tier
+    driver: bridge
