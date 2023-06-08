@@ -56,7 +56,7 @@ metadata:
   name: backend-service
 spec:
   selector:
-    io.kompose.service: db # Selber Selector wie oben. Müssen übereinstimmen. Key von kompose definiert
+    io.kompose.service: backend # Selber Selector wie oben. Müssen übereinstimmen. Key von kompose definiert
   ports:
     - protocol: TCP
       port: 8080
