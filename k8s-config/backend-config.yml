@@ -4,4 +4,4 @@ metadata:
   name: backend-config
 data:
   backend-url: http://backend-service:8080
-  db-url: db-service:5432
+  db-url: db-0.db-service:5432

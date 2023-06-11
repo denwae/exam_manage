@@ -6,14 +6,12 @@ metadata:
     kompose.version: 1.28.0 (c4137012e)
   creationTimestamp: null
   labels:
-    io.kompose.service: frontend
-  name: frontend
+    io.kompose.service: frontend-service
+  name: frontend-service
 spec:
-  type: NodePort # Frontend extern erreichbar machen
   ports:
     - name: "8080"
-      port: 8080
+      port: 80
       targetPort: 80
-      nodePort: 30000 # Default Range 30000-32767
   selector:
     io.kompose.service: frontend

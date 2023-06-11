@@ -1,0 +1,185 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yml
+    kompose.version: 1.28.0 (c4137012e)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: db
+  name: db
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      io.kompose.service: db
+  serviceName: db-service
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yml
+        kompose.version: 1.28.0 (c4137012e)
+      creationTimestamp: null
+      labels:
+#        io.kompose.network/exam-manage-back-tier: "true"
+        io.kompose.service: db
+    spec:
+      initContainers:
+        - name: data-chown
+          image: alpine:3.13.4
+          command: ["/bin/sh", "-c", "install -d -m 0755 -o 1001 -g 1001 /bitnami/postgresql"]
+          volumeMounts:
+            - name: db-data
+              mountPath: /bitnami/postgresql
+      containers:
+        - name: db
+          image: bitnami/postgresql-repmgr:14.8.0
+          imagePullPolicy: IfNotPresent
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /pre-stop.sh
+
+          ports:
+            - containerPort: 5432 # Nachträglich hinzugefügt, in Docker Compose nicht exposed
+
+          env:
+            - name: BITNAMI_DEBUG
+              value: "false"
+            # PostgreSQL configuration
+            - name: POSTGRESQL_VOLUME_DIR
+              value: "/bitnami/postgresql"
+            - name: PGDATA
+              value: "/bitnami/postgresql/data"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-auth
+                  key: db-user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-auth
+                  key: db-password
+            - name: POSTGRES_DB
+              value: "exam-manage"
+            - name: POSTGRESQL_LOG_HOSTNAME
+              value: "true"
+            - name: POSTGRESQL_LOG_CONNECTIONS
+              value: "false"
+            - name: POSTGRESQL_LOG_DISCONNECTIONS
+              value: "false"
+            - name: POSTGRESQL_PGAUDIT_LOG_CATALOG
+              value: "off"
+            - name: POSTGRESQL_CLIENT_MIN_MESSAGES
+              value: "error"
+            - name: POSTGRESQL_SHARED_PRELOAD_LIBRARIES
+              value: "pgaudit, repmgr"
+            - name: POSTGRESQL_ENABLE_TLS
+              value: "no"
+            # Repmgr configuration
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: REPMGR_UPGRADE_EXTENSION
+              value: "no"
+            - name: REPMGR_PGHBA_TRUST_ALL
+              value: "no"
+            - name: REPMGR_MOUNTED_CONF_DIR
+              value: "/bitnami/repmgr/conf"
+            - name: REPMGR_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: REPMGR_PARTNER_NODES
+              value: db-0.db-service.$(REPMGR_NAMESPACE).svc.cluster.local,db-1.db-service.$(REPMGR_NAMESPACE).svc.cluster.local,db-2.db-service.$(REPMGR_NAMESPACE).svc.cluster.local
+            - name: REPMGR_PRIMARY_HOST
+              value: "db-0.db-service.$(REPMGR_NAMESPACE).svc.cluster.local"
+            - name: REPMGR_NODE_NAME
+              value: "$(MY_POD_NAME)"
+            - name: REPMGR_NODE_NETWORK_NAME
+              value: "$(MY_POD_NAME).db-service.$(REPMGR_NAMESPACE).svc.cluster.local"
+            - name: REPMGR_LOG_LEVEL
+              value: "NOTICE"
+            - name: REPMGR_CONNECT_TIMEOUT
+              value: "5"
+            - name: REPMGR_RECONNECT_ATTEMPTS
+              value: "3"
+            - name: REPMGR_RECONNECT_INTERVAL
+              value: "5"
+            - name: REPMGR_USERNAME
+              value: "repmgr"
+            - name: REPMGR_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-auth
+                  key: db-replica-password
+            - name: REPMGR_DATABASE
+              value: "repmgr"
+
+          livenessProbe:
+            exec:
+              command:
+                - bash
+                - -ec
+                - 'PGPASSWORD=$POSTGRES_PASSWORD psql -w -U "postgres" -d "postgres"  -h 127.0.0.1 -c "SELECT 1"'
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
+
+          readinessProbe:
+            exec:
+              command:
+                - bash
+                - -ec
+                - 'PGPASSWORD=$POSTGRES_PASSWORD psql -w -U "postgres" -d "postgres"  -h 127.0.0.1 -c "SELECT 1"'
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
+
+          volumeMounts:
+            - name: db-data
+              mountPath: /bitnami/postgresql
+
+            - name: hook-scripts
+              mountPath: /pre-stop.sh
+              subPath: pre-stop.sh
+
+          resources: {}
+
+      volumes:
+        - name: hook-scripts
+          configMap:
+            name: db-config
+            defaultMode: 0755
+      terminationGracePeriodSeconds: 10
+
+  volumeClaimTemplates:
+    - metadata:
+        name: db-data
+      spec:
+        accessModes: ["ReadWriteOnce" ]
+        storageClassName: "standard"
+        resources:
+          requests:
+            storage: 1Gi
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-service
+spec:
+  selector:
+    io.kompose.service: db # Selber Selector wie oben. Müssen übereinstimmen. Key von kompose definiert
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+  clusterIP: None
