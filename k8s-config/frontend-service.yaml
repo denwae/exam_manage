@@ -8,6 +8,7 @@ metadata:
   labels:
     io.kompose.service: frontend-service
   name: frontend-service
+  namespace: exam-manage
 spec:
   ports:
     - name: "8080"
