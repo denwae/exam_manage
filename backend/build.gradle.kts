@@ -11,23 +11,26 @@ plugins {
     kotlin("plugin.jpa") version "1.8.21"
 }
 
-jib.to.image = System.getenv("EXAM_MANAGE_BACKEND_CONTAINER_REGISTRY") ?: "ghcr.io/denwae/exam_manage-backend:latest"
+jib.to {
+    image = System.getenv("EXAM_MANAGE_BACKEND_CONTAINER_REGISTRY") ?: "ghcr.io/denwae/exam_manage-backend"
+    tags = setOf("latest", "$version")
+}
 jib.from {
-  image = 'eclipse-temurin:17-jre'
+  image = "eclipse-temurin:17-jre"
   platforms {
     platform {
-      architecture = 'amd64'
-      os = 'linux'
+      architecture = "amd64"
+      os = "linux"
     }
     platform {
-      architecture = 'arm64'
-      os = 'linux'
+      architecture = "arm64"
+      os = "linux"
     }
   }
 }
 
 group = "com.exam"
-version = "0.0.1-SNAPSHOT"
+version = "0.1.0"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
