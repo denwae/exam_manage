@@ -12,6 +12,19 @@ plugins {
 }
 
 jib.to.image = System.getenv("EXAM_MANAGE_BACKEND_CONTAINER_REGISTRY") ?: "ghcr.io/denwae/exam_manage-backend:latest"
+jib.from {
+  image = 'eclipse-temurin:17-jre'
+  platforms {
+    platform {
+      architecture = 'amd64'
+      os = 'linux'
+    }
+    platform {
+      architecture = 'arm64'
+      os = 'linux'
+    }
+  }
+}
 
 group = "com.exam"
 version = "0.0.1-SNAPSHOT"
